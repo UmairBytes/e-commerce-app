@@ -16,6 +16,8 @@ public record OrderRequest(
         @Positive(message = "Order amount should be Positive")
         BigDecimal amount,
 
+        @NotNull(message = "Payment method should be preceised")
+        PaymentMethod paymentMethod,
         @NotNull(message = "Customer should be present")
         @NotBlank(message = "Customer should be present")
         @NotEmpty(message = "Customer should be present")
