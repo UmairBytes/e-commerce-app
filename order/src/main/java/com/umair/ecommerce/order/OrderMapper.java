@@ -15,4 +15,7 @@ public class OrderMapper {
                 .paymentMethod(request.paymentMethod())
                 .build();
     }
+
+    public Object fromOrder(Order order) {
+    }
 }
