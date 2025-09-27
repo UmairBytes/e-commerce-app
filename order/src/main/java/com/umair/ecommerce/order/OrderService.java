@@ -8,6 +8,7 @@ import com.umair.ecommerce.orderline.OrderLineRequest;
 import com.umair.ecommerce.orderline.OrderLineService;
 import com.umair.ecommerce.product.ProductClient;
 import com.umair.ecommerce.product.PurchaseRequest;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class OrderService {
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
 
-//    checking the customer->customer microservice
+    //    checking the customer->customer microservice
     public Integer createdOrder(@Valid OrderRequest request) {
         var customer = this.customerClient.findCustomerById(request.customerId())
                 .orElseThrow(() -> new BusinessException("Cannot create order:: No Customer Exist with the provided Id"));
@@ -38,7 +39,7 @@ public class OrderService {
         var order = this.repository.save(mapper.toOrder(request));
 
         //      persist order line
-        for(PurchaseRequest purchaseRequest: request.products()){
+        for (PurchaseRequest purchaseRequest : request.products()) {
             orderLineService.saveOrderLine(
                     new OrderLineRequest(
                             null,
@@ -62,11 +63,18 @@ public class OrderService {
 
 //        send the order confirmation--> notification-ms(kafka)
 
-      return order.getId();
+        return order.getId();
     }
 
-    public List<OrderResponse> findAll(){
+    public List<OrderResponse> findAll() {
         return repository.findAll()
                 .stream().map(mapper::fromOrder).collect(Collectors.toList());
 
+    }
+
+    public OrderResponse findById(Integer orderId) {
+        return repository.findById(orderId)
+                .map(mapper::fromOrder)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("No order found with the provided ID: %d", orderId)));
+    }
 }

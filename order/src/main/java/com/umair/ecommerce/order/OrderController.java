@@ -1,6 +1,5 @@
 package com.umair.ecommerce.order;
 
-(
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +18,19 @@ public class OrderController {
     public ResponseEntity<Integer> createOrder(
             @RequestBody @Valid OrderRequest request
     ){
-        return ResponseEntity.ok(service.createdOrder(request))
+        return ResponseEntity.ok(service.createdOrder(request));
     }
 
     @GetMapping
     public ResponseEntity<List<OrderResponse>> findAll(){
         return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping
+    public ResponseEntity<OrderResponse> findById(
+            @PathVariable("order-id") Integer orderId
+    ){
+        return ResponseEntity.ok(service.findById(orderId));
     }
 
 }
