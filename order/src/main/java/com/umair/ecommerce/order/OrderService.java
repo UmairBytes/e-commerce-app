@@ -6,6 +6,8 @@ import com.umair.ecommerce.kafka.OrderConfirmation;
 import com.umair.ecommerce.kafka.OrderProducer;
 import com.umair.ecommerce.orderline.OrderLineRequest;
 import com.umair.ecommerce.orderline.OrderLineService;
+import com.umair.ecommerce.payment.PaymentClient;
+import com.umair.ecommerce.payment.PaymentRequest;
 import com.umair.ecommerce.product.ProductClient;
 import com.umair.ecommerce.product.PurchaseRequest;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +28,7 @@ public class OrderService {
     private final ProductClient productClient;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
 
     //    checking the customer->customer microservice
     public Integer createdOrder(@Valid OrderRequest request) {
@@ -50,7 +53,16 @@ public class OrderService {
             );
         }
 //      todo  start payment process
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
+        paymentClient.requestOrderPayment(paymentRequest);
 
+        //        send the order confirmation--> notification-ms(kafka)
         orderProducer.sendOrderConfirmation(
                 new OrderConfirmation(
                         request.reference(),
@@ -61,7 +73,7 @@ public class OrderService {
                 )
         );
 
-//        send the order confirmation--> notification-ms(kafka)
+
 
         return order.getId();
     }
