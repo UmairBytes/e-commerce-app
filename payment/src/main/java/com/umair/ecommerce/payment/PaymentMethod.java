@@ -1,4 +1,4 @@
-package com.umair.ecommerce.order;
+package com.umair.ecommerce.payment;
 
 public enum PaymentMethod {
     PAYPAL,
@@ -6,5 +6,4 @@ public enum PaymentMethod {
     VISA,
     MASTER_CARD,
     BITCOIN
-
 }
